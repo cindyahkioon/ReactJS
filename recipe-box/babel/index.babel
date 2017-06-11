@@ -1,0 +1,318 @@
+var Modal = ReactBootstrap.Modal;
+var Button = ReactBootstrap.Button;
+var Form = ReactBootstrap.Form;
+var FormGroup = ReactBootstrap.FormGroup;
+var FormControl = ReactBootstrap.FormControl;
+var ControlLabel = ReactBootstrap.ControlLabel;
+
+if (localStorage.getItem("recipeBox") == undefined) {
+  let recipesObject = {
+    items: [
+      {
+        title: "Tomato and Caper Linguine",
+        ingredients: "cheese, tomato",
+        link:
+          "http://www.jamieoliver.com/recipes/pasta-recipes/tomato-caper-linguine/",
+        image:
+          "http://cdn.jamieoliver.com/recipe-database/430_575/FWu9vav74jz9YKkPYWnU44.jpg"
+      },
+      {
+        title: "Basic Pizza",
+        ingredients: "flour, yeast",
+        link: "http://www.jamieoliver.com/recipes/bread-recipes/basic-pizza/",
+        image:
+          "http://cdn.jamieoliver.com/recipe-database/oldImages/430_575/62_36_1429634659.jpg"
+      },
+      {
+        title: "Spanish tortilla",
+        ingredients: "potatoes, onions",
+        link:
+          "http://www.jamieoliver.com/recipes/eggs-recipes/spanish-tortilla/",
+        image: "http://cdn.jamieoliver.com/recipe-database/430_575/46260004.jpg"
+      },
+      {
+        title: "Pork and apple sausage rolls",
+        ingredients: "pork, apple",
+        link:
+          "http://www.jamieoliver.com/recipes/pork-recipes/pork-apple-sausage-rolls/",
+        image:
+          "http://cdn.jamieoliver.com/recipe-database/430_575/3prSAmQJKKH8G0CFw_2UUT.jpg"
+      }
+    ]
+  };
+  let recipes = JSON.stringify(recipesObject);
+
+  localStorage.setItem("recipeBox", recipes);
+}
+
+class RecipeBox extends React.Component {
+  constructor(props) {
+    super(props);
+    this.loadRecipes = this.loadRecipes.bind(this);
+    this.state = { recipes: localStorage.getItem("recipeBox") };
+  }
+
+  loadRecipes(recipesJson) {
+    localStorage.setItem("recipeBox", JSON.stringify(recipesJson));
+    this.setState({ recipes: localStorage.getItem("recipeBox") });
+  }
+
+  render() {
+    return (
+      <div className="container-fluid">
+        <div className="row" id="header">
+          <div className="col-md-12">
+            <h1>RecipeBox</h1>
+            <a href="#">by cindy ah kioon</a>
+          </div>
+        </div>
+        <Recipes
+          recipes={this.state.recipes}
+          onChange={this.loadRecipes}
+          onDelete={this.loadRecipes}
+        />
+      </div>
+    );
+  }
+}
+
+class Recipes extends React.Component {
+  render() {
+    let recipesJson = JSON.parse(this.props.recipes).items;
+    console.log(recipesJson);
+    let recipes = [];
+    for (let item = 0; item < recipesJson.length; item++) {
+      recipes.push(
+        <Recipe
+          recipeIndex={item}
+          recipeTitle={recipesJson[item]["title"]}
+          recipeIngredients={recipesJson[item]["ingredients"]}
+          recipeLink={recipesJson[item]["link"]}
+          recipeImage={recipesJson[item]["image"]}
+          onSave={this.props.onChange}
+          onDelete={this.props.onChange}
+        />
+      );
+    }
+
+    return (
+      <div className="row">
+        <div className="col-md-12">
+          <div className="row">
+            <AddRecipe onSave={this.props.onChange} />
+            {recipes}
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+class AddRecipe extends React.Component {
+  render() {
+    return (
+      <div className="col-xs-6 col-sm-4 col-md-3">
+        <div className="thumbnail">
+          <RecipeModal
+            buttonText={<i className="fa fa-plus-circle fa-3x" />}
+            title="Add Recipe"
+            recipeTitle="Untitled"
+            recipeIngredients=""
+            recipeImage=""
+            recipeIndex="-1"
+            onSave={this.props.onSave}
+          />
+        </div>
+      </div>
+    );
+  }
+}
+
+class Recipe extends React.Component {
+  constructor(props) {
+    super(props);
+    this.deleteRecipe = this.deleteRecipe.bind(this);
+  }
+
+  deleteRecipe() {
+    let recipesJson = JSON.parse(localStorage.getItem("recipeBox"));
+    let recipeIndex = this.props.recipeIndex;
+    recipesJson.items.splice(recipeIndex, 1);
+    this.props.onSave(recipesJson);
+  }
+
+  render() {
+    let imageCSS = {
+      border: "none",
+      background:
+        "linear-gradient(rgba(0, 0, 0, 0.5), rgba(0,0,0,0.5)), url(" +
+          this.props.recipeImage +
+          ") no-repeat center"
+    };
+    return (
+      <div className="col-xs-6 col-sm-4 col-md-3">
+        <div href="#" className="thumbnail" style={imageCSS}>
+          <h3>
+            <a href={this.props.recipeLink} target="_blank">
+              {this.props.recipeTitle}
+            </a>
+          </h3>
+          <RecipeModal
+            buttonText="Edit"
+            title="Edit Recipe"
+            recipeIndex={this.props.recipeIndex}
+            recipeTitle={this.props.recipeTitle}
+            recipeIngredients={this.props.recipeIngredients}
+            recipeLink={this.props.recipeLink}
+            recipeImage={this.props.recipeImage}
+          />
+          <Button bsStyle="danger" onClick={this.deleteRecipe}>Delete</Button>
+        </div>
+      </div>
+    );
+  }
+}
+
+class RecipeModal extends React.Component {
+  constructor(props) {
+    super(props);
+    this.openModal = this.openModal.bind(this);
+    this.closeModal = this.closeModal.bind(this);
+    this.saveRecipe = this.saveRecipe.bind(this);
+    this.updateRecipeInput = this.updateRecipeInput.bind(this);
+    this.state = {
+      showModal: false,
+      recipeTitle: this.props.recipeTitle,
+      recipeIngredients: this.props.recipeIngredients,
+      recipeLink: this.props.recipeLink,
+      recipeImage: this.props.recipeImage
+    };
+  }
+
+  openModal() {
+    this.setState({ showModal: true });
+  }
+
+  closeModal() {
+    this.setState({ showModal: false });
+  }
+
+  saveRecipe() {
+    let recipesJson = JSON.parse(localStorage.getItem("recipeBox"));
+    let recipeIndex = this.props.recipeIndex;
+    if (recipeIndex == -1) {
+      recipesJson["items"].push({
+        title: this.state.recipeTitle,
+        ingredients: this.state.recipeIngredients,
+        link: this.state.recipeLink,
+        image: this.state.recipeImage
+      });
+    } else {
+      recipesJson["items"][recipeIndex].title = this.state.recipeTitle;
+      recipesJson["items"][
+        recipeIndex
+      ].ingredients = this.state.recipeIngredients;
+      recipesJson["items"][recipeIndex].link = this.state.recipeLink;
+      recipesJson["items"][recipeIndex].image = this.state.recipeImage;
+    }
+    this.props.onSave(recipesJson);
+    this.setState({
+      showModal: false
+    });
+  }
+
+  updateRecipeInput(event) {
+    this.setState({ [event.target.id]: event.target.value });
+  }
+
+  render() {
+    return (
+      <div>
+        <div className="static-Button">
+          <Button bsStyle="info" onClick={this.openModal}>
+            {this.props.buttonText}
+          </Button>
+          <Modal show={this.state.showModal} onHide={this.closeModal}>
+            <Modal.Header>
+              <Modal.Title>{this.props.title}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <RecipeInfo
+                recipeIndex={this.props.recipeIndex}
+                recipeTitle={this.state.recipeTitle}
+                recipeIngredients={this.state.recipeIngredients}
+                recipeLink={this.state.recipeLink}
+                recipeImage={this.state.recipeImage}
+                onChange={this.updateRecipeInput}
+              />
+            </Modal.Body>
+            <Modal.Footer>
+              <Button bsStyle="warning" onClick={this.closeModal}>
+                Cancel
+              </Button>
+              <Button bsStyle="success" onClick={this.saveRecipe}>
+                Save
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </div>
+      </div>
+    );
+  }
+}
+
+class RecipeInfo extends React.Component {
+  render() {
+    return (
+      <Form>
+        <FormGroup>
+          <ControlLabel>Recipe Name</ControlLabel>
+          <FormControl
+            type="text"
+            label="Recipe"
+            placeholder="Recipe Name"
+            id="recipeTitle"
+            value={this.props.recipeTitle}
+            onChange={this.props.onChange}
+          />
+        </FormGroup>
+        <FormGroup>
+          <ControlLabel>Recipe Image Url(optional)</ControlLabel>
+          <FormControl
+            type="text"
+            label="Recipe Image Url"
+            placeholder="Recipe Image Url"
+            id="recipeImage"
+            value={this.props.recipeImage}
+            onChange={this.props.onChange}
+          />
+        </FormGroup>
+        <FormGroup>
+          <ControlLabel>
+            Ingredients (separate each ingredient with a comma)
+          </ControlLabel>
+          <FormControl
+            componentClass="textarea"
+            label="Ingredients"
+            id="recipeIngredients"
+            value={this.props.recipeIngredients}
+            onChange={this.props.onChange}
+          />
+        </FormGroup>
+        <FormGroup>
+          <ControlLabel>Recipe Link (optional)</ControlLabel>
+          <FormControl
+            type="text"
+            label="Recipe Link"
+            placeholder="Recipe Link"
+            id="recipeLink"
+            value={this.props.recipeLink}
+            onChange={this.props.onChange}
+          />
+        </FormGroup>
+      </Form>
+    );
+  }
+}
+
+ReactDOM.render(<RecipeBox />, document.getElementById("recipeBox"));

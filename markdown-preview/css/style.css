@@ -1,0 +1,25 @@
+html, body {
+  height: 100%;
+}
+
+#markpreview {
+  height: 100%;
+}
+
+#wrapper {
+  display:flex;
+  height: 100%;
+}
+
+.input {
+  width: 50%;
+  margin-right: 10px;
+  padding: 10px;
+}
+
+.output {
+  width: 50%;
+  background-color: #f3f3f3;
+  white-space: pre;
+  padding: 10px;
+}

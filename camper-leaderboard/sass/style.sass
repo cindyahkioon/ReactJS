@@ -1,0 +1,44 @@
+$blue: #3498DB
+$red: #E74C3C
+
+body 
+  height: 100%
+  font-family: 'Roboto', sans-serif
+  display: flex
+  flex-direction: column
+  align-items: center
+  text-align: center
+
+h1
+  color: $red
+  
+table, td
+  border: 1px solid #000
+  border-collapse: collapse
+  text-align: center
+  padding: 10px
+  
+th
+  @extend table
+  font-weight: 700
+  color: $red
+  a 
+    display: block
+    color: $red
+    &:hover
+      color: $blue
+ 
+.user 
+  display: flex
+  border-top: none
+  border-right: none
+  border-left: none
+  align-items: center
+  
+  
+.avatar 
+  width: 50px
+  height: 50px
+  vertical-align: middle
+  margin: 2px
+  float: left
