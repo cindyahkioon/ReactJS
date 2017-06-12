@@ -182,17 +182,17 @@ var RecordsTableRows = function (_React$Component4) {
     this.props.records.sort(function (a, b) {
       if (recentSort != "nosort") {
         if (recentSort === "asc") {
-          return a.recent - b.recent > 0;
+          return a.recent - b.recent;
         }
         if (recentSort === "desc") {
-          return a.recent - b.recent < 0;
+          return b.recent - a.recent;
         }
       } else if (allTimeSort != "nosort") {
         if (allTimeSort === "asc") {
-          return a.alltime - b.alltime > 0;
+          return a.alltime - b.alltime;
         }
         if (allTimeSort === "desc") {
-          return a.alltime - b.alltime < 0;
+          return b.alltime - a.alltime;
         }
       }
     });

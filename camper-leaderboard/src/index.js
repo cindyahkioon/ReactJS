@@ -1,3 +1,9 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import registerServiceWorker from './registerServiceWorker';
+import './index.css';
+import './fontawesome/css/font-awesome.min.css';
+
 class Board extends React.Component {
   constructor(props) {
     super(props);
@@ -14,11 +20,11 @@ class Board extends React.Component {
       </div>
     );
   }
-  
+
   componentDidMount() {
-    fetch('https://fcctop100.herokuapp.com/api/fccusers/top/recent')  
+    fetch('https://fcctop100.herokuapp.com/api/fccusers/top/recent')
     .then( (response) => {
-      return response.json()    
+      return response.json()
     })
     .then( (json) => {
       this.setState({
@@ -27,7 +33,7 @@ class Board extends React.Component {
     })
    .catch( (ex) => {
       console.log('parsing failed', ex)
-   });  
+   });
   }
 }
 
@@ -47,7 +53,7 @@ class RecordsTable extends React.Component {
     let newRecentSortOrderIndex =
       (sortOrder.indexOf(sortDirection) + 1) % 3;
     let otherSortColumn = 'recentSort';
-    if(sortColumn == 'recentSort') otherSortColumn = 'allTimeSort';
+    if(sortColumn === 'recentSort') otherSortColumn = 'allTimeSort';
     this.setState({
       [sortColumn]: sortOrder[newRecentSortOrderIndex],
       [otherSortColumn]: "nosort"
@@ -89,22 +95,22 @@ class RecordsTableHeader extends React.Component {
           <th>Rank</th>
           <th>Camper Name</th>
           <th>
-            <a href="#" 
+            <a href="#"
               id="recentSort"
-              data-order={this.props.recentSort} 
+              data-order={this.props.recentSort}
               onClick={this.sort}
             >
-              Points earned in past 30 days             
+              Points earned in past 30 days
               <i className={`fa fa-sort-${this.props.recentSort}`}></i>
             </a>
           </th>
           <th>
             <a href="#"
               id="allTimeSort"
-              data-order={this.props.allTimeSort} 
+              data-order={this.props.allTimeSort}
               onClick={this.sort}
             >
-              Points earned all-time            
+              Points earned all-time
               <i className={`fa fa-sort-${this.props.allTimeSort}`}></i>
             </a></th>
         </tr>
@@ -118,25 +124,25 @@ class RecordsTableRows extends React.Component {
     //console.log(this.state.recentSort);
     var recentSort = this.props.recentSort;
     var allTimeSort = this.props.allTimeSort;
-
-    this.props.records.sort(function(a, b) {
-      if(recentSort != "nosort") {    
+   var records = this.props.records;
+    records = records.sort(function(a, b) {
+      if(recentSort != "nosort") {
         if (recentSort === "asc") {
-          return a.recent - b.recent > 0;
+          return a.recent - b.recent;
         }
         if (recentSort === "desc") {
-          return a.recent - b.recent < 0;
+          return b.recent - a.recent;
         }
-      } else if(allTimeSort != "nosort") {   
+      } else if(allTimeSort != "nosort") {
         if (allTimeSort === "asc") {
-          return a.alltime - b.alltime > 0;
+          return a.alltime - b.alltime;
         }
         if (allTimeSort === "desc") {
-          return a.alltime - b.alltime < 0;
+          return b.alltime - a.alltime;
         }
       }
     });
-    var records = this.props.records;
+    console.log(records);
     var rows = [];
     records.forEach(function(value, index) {
       rows.push(<RecordRow rank={index} record={value} key={value.username} />);
@@ -150,9 +156,9 @@ class RecordRow extends React.Component {
   render() {
     return (
       <tr>
-        <td>{this.props.rank + 1}</td>
-        <td className="user">
-          <img className="avatar" src={this.props.record.img} />
+          <td>{this.props.rank + 1}</td>
+          <td className="user">
+              <img className="avatar" src={this.props.record.img} />
           <span>{this.props.record.username}</span>
         </td>
         <td>{this.props.record.recent}</td>
@@ -162,28 +168,5 @@ class RecordRow extends React.Component {
   }
 }
 
-let campers = [
-  {
-    username: "diomed",
-    img: "https://avatars3.githubusercontent.com/u/72777?v=3",
-    alltime: 4473,
-    recent: 552,
-    lastUpdate: "2017-06-05T09:45:15.687Z"
-  },
-  {
-    username: "sjames1958gm",
-    img: "https://avatars.githubusercontent.com/u/4639625?v=3",
-    alltime: 7225,
-    recent: 510,
-    lastUpdate: "2017-05-31T10:27:51.438Z"
-  },
-  {
-    username: "anthonygallina1",
-    img: "https://avatars.githubusercontent.com/u/11003055?v=3",
-    alltime: 4878,
-    recent: 495,
-    lastUpdate: "2017-06-06T17:52:05.145Z"
-  }
-];
-
 ReactDOM.render(<Board />, document.getElementById("main"));
+registerServiceWorker();

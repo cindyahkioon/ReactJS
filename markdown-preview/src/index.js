@@ -1,0 +1,60 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+import marked from 'marked';
+import registerServiceWorker from './registerServiceWorker';
+import './index.css';
+
+class MarkDownPreviewer extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      inputText: this.props.text
+    };
+
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+
+  handleChange(event) {
+    this.setState({inputText: event.target.value});
+  }
+
+  render() {
+    return (
+      <div id="wrapper">
+        <MarkDownInput value={this.state.inputText} onChange={this.handleChange}/>
+        <MarkDownOutput output={this.state.inputText}/>
+      </div>
+    );
+  }
+}
+
+class MarkDownInput extends React.Component {
+  render() {
+    return (
+      <textarea className="input" onChange={this.props.onChange}>{this.props.value}</textarea>
+    );
+  }
+}
+
+class MarkDownOutput extends React.Component {
+  parseMarkup(rawInput) {
+    var rawMarkup = marked(rawInput, {gfm: true, sanitize: true});
+    return {__html: rawMarkup};
+  }
+
+  render() {
+    return (
+      <div className="output" dangerouslySetInnerHTML={this.parseMarkup(this.props.output)}>
+
+      </div>
+    );
+  }
+}
+
+var previewText = '# Heading\n\n ## Sub-heading\n \n### Another deeper heading\n \nParagraphs are separated\nby a blank line.\n\nLeave 2 spaces at the end of a line to do a  \nline break\n\nText attributes *italic*, **bold**, \n`monospace`, ~~strikethrough~~ .\n\nShopping list:\n\n  * apples\n  * oranges\n  * pears\n\nNumbered list:\n\n  1. apples\n  2. oranges\n  3. pears\n\nThe rain---not the reign---in\nSpain.\n\n *[Herman Fassett](https://freecodecamp.com/hermanfassett)*';
+
+ReactDOM.render(
+  <MarkDownPreviewer text={previewText} />,
+  document.getElementById('markpreview')
+);registerServiceWorker();
